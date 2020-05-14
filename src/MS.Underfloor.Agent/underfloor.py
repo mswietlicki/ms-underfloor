@@ -25,4 +25,4 @@ while True:
 
     requests.post(url, json={'temps': temps,
                              'state': 'ON' if heaterOn else 'OFF'})
-    time.sleep(5)
+    time.sleep(60)
