@@ -1,0 +1,7 @@
+POST http://localhost:5000/api/temps
+Content-Type: application/json
+
+{
+    "temps": [ 20.22, 20.00 ],
+    "state": "ON"
+}
