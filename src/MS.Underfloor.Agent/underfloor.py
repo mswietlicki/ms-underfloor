@@ -10,15 +10,19 @@ GPIO.setup(14, GPIO.OUT)
 GPIO.output(14, GPIO.HIGH)
 heaterOn = False
 
-url = 'https://webhook.site/3b6578b3-3716-4a7c-a509-c0f45ef4b2ff'
+url = 'https://ms-underfloor.azurewebsites.net/api/temps'
 while True:
-	temps = []
-	for sensor in W1ThermSensor.get_available_sensors():
-		temp = sensor.get_temperature()
-		temps.append(temp)
-	if temps[0] > 30:
-        	GPIO.output(14, GPIO.LOW)
-	else:
-		GPIO.output(14, GPIO.HIGH)
-	requests.post(url, json=temps)
-	time.sleep(5)
+    temps = []
+    for sensor in W1ThermSensor.get_available_sensors():
+        temp = sensor.get_temperature()
+        temps.append(temp)
+    if temps[0] > 30:
+        heaterOn = True
+        GPIO.output(14, GPIO.LOW)
+    else:
+        heaterOn = False
+        GPIO.output(14, GPIO.HIGH)
+
+    requests.post(url, json={'temps': temps,
+                             'state': 'ON' if heaterOn else 'OFF'})
+    time.sleep(5)

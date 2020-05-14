@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace MS.Underfloor.Api.Controllers
             if(report == null)
                 return BadRequest();
 
+            report.Timestamp = DateTime.Now;
             Reports.Add(report);
 
             return Accepted();
