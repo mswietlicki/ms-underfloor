@@ -1,49 +1,63 @@
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<div id="chart_div"></div>
+<!DOCTYPE html>
+<html>
 
-<script lang="javascript">
-    google.charts.load('current', { packages: ['corechart', 'line'] });
-    //google.charts.setOnLoadCallback(drawCurveTypes);
+<head>
+    <title>Underfloor</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="Mateusz Świetlicki">
+    <meta http-equiv="refresh" content="60">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
-    fetch('https://ms-underfloor.azurewebsites.net/api/temps')
-        .then(res => res.json())
-        .then((out) => drawCurveTypes(out))
+<body>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <div id="chart_div"></div>
+
+    <script lang="javascript">
+        google.charts.load('current', { packages: ['corechart', 'line'] });
+        google.charts.setOnLoadCallback(drawTempsTypes);
+
+        temps = [{ "temps": [24.6875, 21], "state": "OFF", "timestamp": "2020-05-14T23:13:55.4191749+00:00" }, { "temps": [24.5625, 20.9375], "state": "OFF", "timestamp": "2020-05-14T23:14:57.8894772+00:00" }, { "temps": [24.5, 20.9375], "state": "OFF", "timestamp": "2020-05-14T23:16:00.2575156+00:00" }, { "temps": [25.875, 20.4375], "state": "OFF", "timestamp": "2020-05-14T23:17:02.6127721+00:00" }, { "temps": [28.25, 17.6875], "state": "OFF", "timestamp": "2020-05-14T23:18:05.0088034+00:00" }, { "temps": [29.5625, 15.875], "state": "OFF", "timestamp": "2020-05-14T23:19:07.3983346+00:00" }, { "temps": [30.25, 14.6875], "state": "ON", "timestamp": "2020-05-14T23:20:09.7383198+00:00" }, { "temps": [30.375, 14.8125], "state": "ON", "timestamp": "2020-05-14T23:21:12.2287395+00:00" }, { "temps": [30.4375, 15.8125], "state": "ON", "timestamp": "2020-05-14T23:22:14.6190227+00:00" }, { "temps": [30.5625, 16.625], "state": "ON", "timestamp": "2020-05-14T23:23:17.0966194+00:00" }, { "temps": [30.5, 17.3125], "state": "ON", "timestamp": "2020-05-14T23:24:19.4542041+00:00" }, { "temps": [30.4375, 17.875], "state": "ON", "timestamp": "2020-05-14T23:25:21.8202827+00:00" }, { "temps": [30.4375, 18.3125], "state": "ON", "timestamp": "2020-05-14T23:26:24.1345652+00:00" }, { "temps": [30.375, 18.625], "state": "ON", "timestamp": "2020-05-14T23:27:26.5037743+00:00" }, { "temps": [30.375, 18.875], "state": "ON", "timestamp": "2020-05-14T23:28:28.9338174+00:00" }, { "temps": [30.3125, 19.125], "state": "ON", "timestamp": "2020-05-14T23:29:31.379888+00:00" }, { "temps": [30.3125, 19.25], "state": "ON", "timestamp": "2020-05-14T23:30:33.7431029+00:00" }, { "temps": [30.25, 19.375], "state": "ON", "timestamp": "2020-05-14T23:31:36.1039508+00:00" }]
+        fetch('https://ms-underfloor.azurewebsites.net/api/temps')
+            .then(res => res.json())
+            .then((out) => { temps = out; drawTempsTypes() })
+
+        function drawTempsTypes() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('datetime', 'Timestamp');
+            data.addColumn('number', 'Floor');
+            data.addColumn('number', 'Room');
+            data.addColumn('number', 'Target');
+            data.addColumn('number', 'Heater');
+
+            temps.map(x => [x.timestamp, x.temps[0], x.temps[1]])
+
+            data.addRows(temps.map(x => [new Date(Date.parse(x.timestamp)), x.temps[0], x.temps[1], 30, x.state == "ON" ? 1 : 0]));
+
+            var options = {
+                height: 800,
+                series: {
+                    0: { pointSize: 4, color: 'red' },
+                    1: { pointSize: 4, color: 'blue' },
+                    2: { pointSize: 4, color: 'black' },
+                    3: { type: 'area', targetAxisIndex: 1, color: '#ffbbbb' }
+                },
+                vAxes: {
+                    0: { format: '0 °C' },
+                    1: { minValue: 0, maxValue: 1, format: '0' },
+                },
+                hAxis: {
+                    format: 'h:mm'
+                }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
 
 
-    function drawCurveTypes(temps) {
-        var data = new google.visualization.DataTable();
-        data.addColumn('number', 'X');
-        data.addColumn('number', 'Podłoga');
-        data.addColumn('number', 'Powietrze');
+</body>
 
-        data.addRows([
-            [0, 0, 0], [1, 10, 5], [2, 23, 15], [3, 17, 9], [4, 18, 10], [5, 9, 5],
-            [6, 11, 3], [7, 27, 19], [8, 33, 25], [9, 40, 32], [10, 32, 24], [11, 35, 27],
-            [12, 30, 22], [13, 40, 32], [14, 42, 34], [15, 47, 39], [16, 44, 36], [17, 48, 40],
-            [18, 52, 44], [19, 54, 46], [20, 42, 34], [21, 55, 47], [22, 56, 48], [23, 57, 49],
-            [24, 60, 52], [25, 50, 42], [26, 52, 44], [27, 51, 43], [28, 49, 41], [29, 53, 45],
-            [30, 55, 47], [31, 60, 52], [32, 61, 53], [33, 59, 51], [34, 62, 54], [35, 65, 57],
-            [36, 62, 54], [37, 58, 50], [38, 55, 47], [39, 61, 53], [40, 64, 56], [41, 65, 57],
-            [42, 63, 55], [43, 66, 58], [44, 67, 59], [45, 69, 61], [46, 69, 61], [47, 70, 62],
-            [48, 72, 64], [49, 68, 60], [50, 66, 58], [51, 65, 57], [52, 67, 59], [53, 70, 62],
-            [54, 71, 63], [55, 72, 64], [56, 73, 65], [57, 75, 67], [58, 70, 62], [59, 68, 60],
-            [60, 64, 56], [61, 60, 52], [62, 65, 57], [63, 67, 59], [64, 68, 60], [65, 69, 61],
-            [66, 70, 62], [67, 72, 64], [68, 75, 67], [69, 80, 72]
-        ]);
-
-        var options = {
-            hAxis: {
-                title: 'Time'
-            },
-            vAxis: {
-                title: 'Temp C'
-            },
-            series: {
-                1: { curveType: 'function' }
-            }
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-    }
-</script>
+</html>
