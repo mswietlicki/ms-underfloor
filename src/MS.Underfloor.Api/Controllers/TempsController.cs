@@ -38,9 +38,9 @@ namespace MS.Underfloor.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult List()
+        public async Task<IActionResult> List()
         {
-            return Ok(Reports.ToList());
+            return Ok(await _tempsRepository.GetTemps(DateTime.Now));
         }
     }
 

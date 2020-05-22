@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -33,10 +34,30 @@ namespace MS.Underfloor.Api.Data
                 HeaterOn = temp.State == "ON"
             };
         }
+        private TempReport Map(TempReportEntity entity)
+        {
+            return new TempReport
+            {
+                State = entity.HeaterOn ? "ON" : "OFF",
+                Temps = JsonSerializer.Deserialize<double[]>(entity.Temps),
+                Timestamp = entity.Timestamp.DateTime
+            };
+        }
 
         public async Task<IReadOnlyCollection<TempReport>> GetTemps(DateTime from, DateTime? to)
         {
-            throw new NotImplementedException();
+            var query = new TableQuery<TempReportEntity>()
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, from.ToString("ddMMyyyy")));
+
+            var tempEntities = new List<TempReportEntity>();
+            TableContinuationToken continuationToken = null;
+            do
+            {
+                var result = await _table.ExecuteQuerySegmentedAsync(query, continuationToken);
+                tempEntities.AddRange(result);
+                continuationToken = result.ContinuationToken;
+            } while (continuationToken != null);
+            return tempEntities.Select(Map).ToList();
         }
     }
 }
