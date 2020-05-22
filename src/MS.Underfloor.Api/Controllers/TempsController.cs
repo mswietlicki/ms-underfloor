@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MS.Underfloor.Api.Data;
 
 namespace MS.Underfloor.Api.Controllers
 {
@@ -12,10 +13,13 @@ namespace MS.Underfloor.Api.Controllers
     public class TempsController : ControllerBase
     {
         public static Buffer<TempReport> Reports { get; set; } = new Buffer<TempReport>(60 * 24);
+
+        private readonly ITempsRepository _tempsRepository;
         private readonly ILogger<TempsController> _logger;
 
-        public TempsController(ILogger<TempsController> logger)
+        public TempsController(ITempsRepository tempsRepository, ILogger<TempsController> logger)
         {
+            _tempsRepository = tempsRepository;
             _logger = logger;
         }
 
@@ -27,6 +31,8 @@ namespace MS.Underfloor.Api.Controllers
 
             report.Timestamp = DateTime.Now;
             Reports.Add(report);
+
+            await _tempsRepository.InsertTemp(report);
 
             return Accepted();
         }

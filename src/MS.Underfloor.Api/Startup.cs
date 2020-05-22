@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MS.Underfloor.Api.Data;
 
 namespace MS.Underfloor.Api
 {
@@ -27,6 +28,9 @@ namespace MS.Underfloor.Api
         {
             services.AddControllers();
             services.AddCors(o => o.AddDefaultPolicy(b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials()));
+
+            services.AddSingleton<ITempsRepository, StorageTempsRepository>(p =>
+                new StorageTempsRepository(Configuration.GetConnectionString("StorageConnectionString")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
