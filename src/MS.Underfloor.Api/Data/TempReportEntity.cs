@@ -7,8 +7,8 @@ namespace MS.Underfloor.Api.Data
     {
         public TempReportEntity(DateTime timestamp)
         {
-            PartitionKey = timestamp.Date.ToShortDateString();
-            RowKey = timestamp.ToLongTimeString();
+            PartitionKey = timestamp.Date.ToString("ddMMyyyy");
+            RowKey = timestamp.ToString("HHmmss");
             Timestamp = timestamp;
         }
 
