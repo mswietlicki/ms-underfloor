@@ -17,6 +17,7 @@ namespace MS.Underfloor.Api.Data
         }
 
         public string Temps { get; set; }
+        public double HeaterLimitTemp { get; set; }
         public bool HeaterOn { get; set; }
     }
 }

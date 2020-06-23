@@ -31,16 +31,28 @@ namespace MS.Underfloor.Api.Data
             return new TempReportEntity(temp.Timestamp)
             {
                 Temps = JsonSerializer.Serialize(temp.Temps),
+                HeaterLimitTemp = new AgentConfig().HeaterLimitTemp,
                 HeaterOn = temp.State == "ON"
             };
         }
         private TempReport Map(TempReportEntity entity)
         {
+            TimeZoneInfo easternZone;
+            try
+            {
+                easternZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                easternZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Warsaw");
+            }
+
             return new TempReport
             {
                 State = entity.HeaterOn ? "ON" : "OFF",
+                HeaterLimitTemp = entity.HeaterLimitTemp,
                 Temps = JsonSerializer.Deserialize<double[]>(entity.Temps),
-                Timestamp = entity.Timestamp.DateTime
+                Timestamp = TimeZoneInfo.ConvertTimeFromUtc(entity.Timestamp.DateTime, easternZone)
             };
         }
 

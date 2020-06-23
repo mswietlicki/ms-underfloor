@@ -18,7 +18,7 @@
         google.charts.load('current', { packages: ['corechart', 'line'] });
         google.charts.setOnLoadCallback(drawTempsTypes);
 
-        temps = [{ "temps": [24.6875, 21], "state": "OFF", "timestamp": "2020-05-14T23:13:55.4191749+00:00" }, { "temps": [24.5625, 20.9375], "state": "OFF", "timestamp": "2020-05-14T23:14:57.8894772+00:00" }, { "temps": [24.5, 20.9375], "state": "OFF", "timestamp": "2020-05-14T23:16:00.2575156+00:00" }, { "temps": [25.875, 20.4375], "state": "OFF", "timestamp": "2020-05-14T23:17:02.6127721+00:00" }, { "temps": [28.25, 17.6875], "state": "OFF", "timestamp": "2020-05-14T23:18:05.0088034+00:00" }, { "temps": [29.5625, 15.875], "state": "OFF", "timestamp": "2020-05-14T23:19:07.3983346+00:00" }, { "temps": [30.25, 14.6875], "state": "ON", "timestamp": "2020-05-14T23:20:09.7383198+00:00" }, { "temps": [30.375, 14.8125], "state": "ON", "timestamp": "2020-05-14T23:21:12.2287395+00:00" }, { "temps": [30.4375, 15.8125], "state": "ON", "timestamp": "2020-05-14T23:22:14.6190227+00:00" }, { "temps": [30.5625, 16.625], "state": "ON", "timestamp": "2020-05-14T23:23:17.0966194+00:00" }, { "temps": [30.5, 17.3125], "state": "ON", "timestamp": "2020-05-14T23:24:19.4542041+00:00" }, { "temps": [30.4375, 17.875], "state": "ON", "timestamp": "2020-05-14T23:25:21.8202827+00:00" }, { "temps": [30.4375, 18.3125], "state": "ON", "timestamp": "2020-05-14T23:26:24.1345652+00:00" }, { "temps": [30.375, 18.625], "state": "ON", "timestamp": "2020-05-14T23:27:26.5037743+00:00" }, { "temps": [30.375, 18.875], "state": "ON", "timestamp": "2020-05-14T23:28:28.9338174+00:00" }, { "temps": [30.3125, 19.125], "state": "ON", "timestamp": "2020-05-14T23:29:31.379888+00:00" }, { "temps": [30.3125, 19.25], "state": "ON", "timestamp": "2020-05-14T23:30:33.7431029+00:00" }, { "temps": [30.25, 19.375], "state": "ON", "timestamp": "2020-05-14T23:31:36.1039508+00:00" }]
+        temps = []; //{ "temps": [24.6875, 21], "state": "OFF", "timestamp": "2020-05-14T23:13:55.4191749+00:00" }, { "temps": [24.5625, 20.9375], "state": "OFF", "timestamp": "2020-05-14T23:14:57.8894772+00:00" }, { "temps": [24.5, 20.9375], "state": "OFF", "timestamp": "2020-05-14T23:16:00.2575156+00:00" }, { "temps": [25.875, 20.4375], "state": "OFF", "timestamp": "2020-05-14T23:17:02.6127721+00:00" }, { "temps": [28.25, 17.6875], "state": "OFF", "timestamp": "2020-05-14T23:18:05.0088034+00:00" }, { "temps": [29.5625, 15.875], "state": "OFF", "timestamp": "2020-05-14T23:19:07.3983346+00:00" }, { "temps": [30.25, 14.6875], "state": "ON", "timestamp": "2020-05-14T23:20:09.7383198+00:00" }, { "temps": [30.375, 14.8125], "state": "ON", "timestamp": "2020-05-14T23:21:12.2287395+00:00" }, { "temps": [30.4375, 15.8125], "state": "ON", "timestamp": "2020-05-14T23:22:14.6190227+00:00" }, { "temps": [30.5625, 16.625], "state": "ON", "timestamp": "2020-05-14T23:23:17.0966194+00:00" }, { "temps": [30.5, 17.3125], "state": "ON", "timestamp": "2020-05-14T23:24:19.4542041+00:00" }, { "temps": [30.4375, 17.875], "state": "ON", "timestamp": "2020-05-14T23:25:21.8202827+00:00" }, { "temps": [30.4375, 18.3125], "state": "ON", "timestamp": "2020-05-14T23:26:24.1345652+00:00" }, { "temps": [30.375, 18.625], "state": "ON", "timestamp": "2020-05-14T23:27:26.5037743+00:00" }, { "temps": [30.375, 18.875], "state": "ON", "timestamp": "2020-05-14T23:28:28.9338174+00:00" }, { "temps": [30.3125, 19.125], "state": "ON", "timestamp": "2020-05-14T23:29:31.379888+00:00" }, { "temps": [30.3125, 19.25], "state": "ON", "timestamp": "2020-05-14T23:30:33.7431029+00:00" }, { "temps": [30.25, 19.375], "state": "ON", "timestamp": "2020-05-14T23:31:36.1039508+00:00" }]
         fetch('https://ms-underfloor.azurewebsites.net/api/temps')
             .then(res => res.json())
             .then((out) => { temps = out; drawTempsTypes() })
@@ -33,7 +33,7 @@
 
             temps.map(x => [x.timestamp, x.temps[0], x.temps[1]])
 
-            data.addRows(temps.map(x => [new Date(Date.parse(x.timestamp)), x.temps[0], x.temps[1], 30, x.state == "ON" ? 1 : 0]));
+            data.addRows(temps.map(x => [new Date(Date.parse(x.timestamp)), x.temps[0], x.temps[1], x.heaterLimitTemp, x.state == "ON" ? 1 : 0]));
 
             var options = {
                 height: 800,
@@ -48,7 +48,7 @@
                     1: { minValue: 0, maxValue: 1, format: '0' },
                 },
                 hAxis: {
-                    format: 'h:mm'
+                    format: 'H:mm'
                 }
             };
 
