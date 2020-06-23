@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,9 @@ namespace MS.Underfloor.Api.Controllers
         {
             if (report == null)
                 return BadRequest();
+
+            if (report.Temps.Any(t => t > 100 || t < -40))
+                return UnprocessableEntity();
 
             report.Timestamp = DateTime.Now;
             Reports.Add(report);
